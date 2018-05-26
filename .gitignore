@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+
+#Ignored files
+*.directory
+trab1PL
+CMakeLists.txt
+cmake*
+.idea
