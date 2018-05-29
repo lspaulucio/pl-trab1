@@ -254,6 +254,7 @@ bool Simplex::checaColuna(int c){
 void Simplex::imprimeResultado() {
 
     bool variasSolucoes = false;
+    bool degenerada = false;
 
     printf("z* = %.3lf\n", tabela[z][b]);
     printf("x* = ( ");
@@ -273,11 +274,17 @@ void Simplex::imprimeResultado() {
     }
     printf(")\n");
 
+    for(int i = z + 1; i < linhas; i++)
+        if(tabela[i][b] == 0)
+            degenerada = true;
+
     if(variasSolucoes)
         printf("Infinitas solucoes\n");
     else
         printf("Solucao unica\n");
 
+    if(degenerada)
+        printf("Solucao degenerada\n");
 }
 
 bool Simplex::naBase(int b)
