@@ -41,6 +41,7 @@ class Simplex {
     void ajustaLinhaPivo(int, int);
     bool checaColuna(int);
     void imprimeResultado();
+    void segundaFase();
     int getIndBase(int);
     bool naBase(int);
 

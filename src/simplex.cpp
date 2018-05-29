@@ -25,8 +25,8 @@ void Simplex::criaTablau(PPL p){
     numVB = p.getNumVB(); //numero de variaveis basicas
 
 
-    colunas = p.getNumColunas() + numVF + numVA; //calculas numero de colunas do tablau
-    linhas = p.getNumLinhas(); //Calcula numero de linhas
+    colunas = p.getNumColunas() + numVF + numVA; //calcula numero de colunas do tablau
+    linhas = p.getNumLinhas(); //calcula numero de linhas
 
     //se tem variaveis artificiais adiciona mais uma linha ao tablau
     if (numVA > 0) {
@@ -53,7 +53,7 @@ void Simplex::criaTablau(PPL p){
     for (i = 0; i < linhas; i++)
         tabela[i] = (double *) calloc(colunas, sizeof(double));
 
-    bases = (int *) calloc(p.getNumVB(), sizeof(int));
+    bases = (int *) calloc(numVB, sizeof(int));
 
     //Fim da alocacao
 
@@ -82,7 +82,7 @@ void Simplex::criaTablau(PPL p){
     //Inicializando variaveis de folga e artificiais
     int indF = indiceFolga, indA = indiceArtificial;
     int indB = 0;
-    for (int i = 1; i < p.getNumLinhas(); i++)
+    for (i = 1; i < p.getNumLinhas(); i++)
         switch (p.getRestricao(i)) {
             case POS_SA:
                 tabela[z + i][indF] = 1;
@@ -111,6 +111,7 @@ void Simplex::imprimeTablau() {
 
     printf("\tb\t");
 
+    //printa as variaveis que estao na base
     for (j = 1; j <= numVN; j++)
         printf("X%d\t", k++);
 
@@ -124,7 +125,8 @@ void Simplex::imprimeTablau() {
 
     printf("\n");
 
-    k = 0;
+    k = 0; //variavel auxiliar para printar os indices que estao na base
+
     for (i = 0; i < linhas; i++) {
         if (i == 0 && numVA > 0) //Verifica se existem variaveis artificiais para printar o za
             printf("Za\t");
@@ -146,34 +148,49 @@ void Simplex::imprimeTablau() {
 
 void Simplex::simplex() {
 
-    int indEntra = entraBase();
+    if(numVA > 0)
+    {
+        //primeira fase
+    }
+    else{
+        printf("Iniciando segunda fase do simplex\n");
+        segundaFase();
+    }
+
+    //imprime ultimo tablau
+    printf("Tablau final\n");
+    imprimeTablau();
+}
+
+void Simplex::segundaFase() {
+
+    int indEntra = entraBase(); //Obtem nova variavel que entra na base
     int indSai;
 
-    while(indEntra != -1) {
+    while(indEntra != -1) { //Checa se existe um índice que pode entrar na base
 
-        checaColuna(indEntra);
+        indSai = saiBase(indEntra); //obtem variavel que sai da base
 
-        indSai = saiBase(indEntra);
+        imprimeTablau(); //imprime tablau
 
-        imprimeTablau();
-
+        //Se o pivo for diferente de 1 ajusta a linha
         if (tabela[indSai][indEntra] != 1.0) {
             ajustaLinhaPivo(indSai, indEntra);
         }
 
+        //Atualiza o tablau com a nova variavel basica
         atualizaTablau(indSai, indEntra);
 
+        //Obtem nova variavel que entra na base
         indEntra = entraBase();
     }
 
-    printf("Tablau final\n");
-    imprimeTablau();
 }
 
 int Simplex::entraBase(){
 
     int indiceMaximo = -1;
-    int maior = 0;
+    double maior = 0;
 
     for(int i = 1; i < colunas; i++) {
         if (tabela[z][i] > maior) {
@@ -184,6 +201,7 @@ int Simplex::entraBase(){
 
     if(indiceMaximo != -1) {
         printf("X%d entra na base\n", indiceMaximo);
+        checaColuna(indiceMaximo);
     }
 
     return indiceMaximo;
@@ -191,7 +209,7 @@ int Simplex::entraBase(){
 
 int Simplex::saiBase(int coluna) {
 
-    int indiceMinimo;
+    int indiceMinimo = 0;
     double min = 1000000000;
 
     for(int i = 1; i < linhas; i++) {
@@ -203,7 +221,8 @@ int Simplex::saiBase(int coluna) {
         }
     }
 
-    printf("X%d sai da base\n ", bases[indiceMinimo-1]);
+    if(indiceMinimo > 0) //Se for um indice valido
+        printf("X%d sai da base\n ", bases[indiceMinimo-1]);
 
     return  indiceMinimo;
 }
@@ -211,6 +230,8 @@ int Simplex::saiBase(int coluna) {
 void Simplex::ajustaLinhaPivo(int l, int c){
 
     double pivo = tabela[l][c];
+
+    //divide toda a linha do pivo pelo proprio pivo para ele se tornar 1
 
     for(int i = 0; i < colunas; i++)
     {
@@ -220,35 +241,46 @@ void Simplex::ajustaLinhaPivo(int l, int c){
 
 void Simplex::atualizaTablau(int l, int c) {
 
-    double fator;
+    double fator; //variavel que multiplica o pivo para tornar a coluna igual a 0
 
     for(int i = 0; i < linhas; i++) {
-        if(i != l) {
+        if(i != l) { //se a linha nao for a do pivo zera
             if (tabela[i][c] != 0) {
-                fator = -tabela[i][c];
 
+                fator = -tabela[i][c]; //calcula o fator da linha
+
+                //atualiza toda a linha
                 for (int j = 0; j < colunas; j++) {
                     tabela[i][j] += (fator * tabela[l][j]);
                 }
             }
         }
     }
+
+    //atualiza a variavel na base
     bases[l-1] = c;
 }
 
 bool Simplex::checaColuna(int c){
 
+    //checa se a coluna da variavel candidata e toda negativa
+
     for(int i = 1; i < linhas; i++)
         if(tabela[i][c] > 0)
             return true;
 
-    printf("z -> ");
+    //se for solucao tende ao infinito
+
+    printf("Tablau final\n");
+    imprimeTablau();
+
+    printf("Nao existe solucao: z -> ");
     if(funcao == MIN)
         printf("-inf\n");
     else
         printf("+inf\n");
 
-    exit(1);
+    exit(EXIT_SUCCESS);
 }
 
 void Simplex::imprimeResultado() {
@@ -259,21 +291,23 @@ void Simplex::imprimeResultado() {
     printf("z* = %.3lf\n", tabela[z][b]);
     printf("x* = ( ");
 
-
+    //
     for(int i = 1; i < colunas; i++){
-        if(naBase(i)){
+
+        if(naBase(i)){ //se a variavel esta na base
             int j = getIndBase(i);
-            printf("%.3lf ", tabela[j+1][b]);
+            printf("%.3lf ", tabela[j+1][b]); //imprime o valor da variavel
         }
         else {
-            if(tabela[z][i] == 0)
-                variasSolucoes = true;
+            if(tabela[z][i] == 0) //checa se uma variavel nao basica e zero na linha do z
+                variasSolucoes = true; //se for tem varias solucoes
 
             printf("0 ");
         }
     }
     printf(")\n");
 
+    //checa se alguma variavel basica e zero, se for a solucao e degenerada
     for(int i = z + 1; i < linhas; i++)
         if(tabela[i][b] == 0)
             degenerada = true;
@@ -289,6 +323,7 @@ void Simplex::imprimeResultado() {
 
 bool Simplex::naBase(int b)
 {
+    //verifica se a variavel b esta na base
     for(int i = 0; i < numVB ; i++){
         if(bases[i] == b)
             return true;
@@ -297,7 +332,7 @@ bool Simplex::naBase(int b)
 }
 
 int Simplex::getIndBase(int b){
-
+    // obtem o indice da variavel na base, para poder imprimir
     for(int i = 0; i < numVB ; i++){
         if(bases[i] == b)
             return i;
