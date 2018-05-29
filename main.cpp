@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "src/ppl.h"
-#include "src/tablau.h"
+#include "src/simplex.h"
 
 int main() {
 
@@ -17,10 +17,11 @@ int main() {
     problema.readPPL(stdin);
 //    problema.imprimePPL();
 
-    Tablau t;
+    Simplex t;
     t.criaTablau(problema);
+    t.simplex();
     t.imprimeTablau();
-
+    t.imprimeResultado();
 
     return 0;
 }
