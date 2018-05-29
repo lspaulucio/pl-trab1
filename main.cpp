@@ -20,7 +20,6 @@ int main() {
     Simplex t;
     t.criaTablau(problema);
     t.simplex();
-    t.imprimeTablau();
     t.imprimeResultado();
 
     return 0;

@@ -165,6 +165,9 @@ void Simplex::simplex() {
 
         indEntra = entraBase();
     }
+
+    printf("Tablau final\n");
+    imprimeTablau();
 }
 
 int Simplex::entraBase(){
