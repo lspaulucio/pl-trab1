@@ -164,7 +164,7 @@ void Simplex::simplex() {
 
 void Simplex::segundaFase() {
 
-    int indEntra = entraBase(); //Obtem nova variavel que entra na base
+    int indEntra = entraBase(z); //Obtem nova variavel que entra na base
     int indSai;
 
     while(indEntra != -1) { //Checa se existe um índice que pode entrar na base
@@ -182,20 +182,20 @@ void Simplex::segundaFase() {
         atualizaTablau(indSai, indEntra);
 
         //Obtem nova variavel que entra na base
-        indEntra = entraBase();
+        indEntra = entraBase(z);
     }
 
 }
 
-int Simplex::entraBase(){
+int Simplex::entraBase(int linha){
 
     int indiceMaximo = -1;
     double maior = 0;
 
     for(int i = 1; i < colunas; i++) {
-        if (tabela[z][i] > maior) {
+        if (tabela[linha][i] > maior) {
             indiceMaximo = i;
-            maior = tabela[z][i];
+            maior = tabela[linha][i];
         }
     }
 
@@ -288,7 +288,13 @@ void Simplex::imprimeResultado() {
     bool variasSolucoes = false;
     bool degenerada = false;
 
-    printf("z* = %.3lf\n", tabela[z][b]);
+    printf("z* = ");
+
+    if(funcao == MAX)
+        printf("%.3lf\n", -tabela[z][b]);
+    else
+        printf("%.3lf\n", tabela[z][b]);
+    
     printf("x* = ( ");
 
     //

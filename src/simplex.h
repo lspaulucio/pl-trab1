@@ -35,7 +35,7 @@ class Simplex {
     void criaTablau(PPL);
     void imprimeTablau();
     void simplex();
-    int entraBase();
+    int entraBase(int);
     int saiBase(int);
     void atualizaTablau(int, int);
     void ajustaLinhaPivo(int, int);
