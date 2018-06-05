@@ -16,14 +16,12 @@ Simplex::Simplex() {
     numVB = 0;
 }
 
-
 void Simplex::criaTablau(PPL p){
 
     numVN = p.getNumVN(); //numero de variaveis naturais
     numVF = p.getNumVF(); //numero de variaveis folga
     numVA = p.getNumVA(); //numero de variaveis artificiais
     numVB = p.getNumVB(); //numero de variaveis basicas
-
 
     colunas = p.getNumColunas() + numVF + numVA; //calcula numero de colunas do tablau
     linhas = p.getNumLinhas(); //calcula numero de linhas
@@ -146,20 +144,93 @@ void Simplex::imprimeTablau() {
     printf("\n");
 }
 
+void Simplex::analisaPrimeiraFase() {
+
+
+    if(tabela[za][b] != 0) {
+        imprimeTablau();
+        printf("Conjunto vazio\n");
+        exit(1);
+    }
+
+
+    verificaBase();
+
+    colunas -= numVA;
+}
+
+void Simplex::verificaBase(){
+
+    int indArt = numVN + numVF;
+}
+
 void Simplex::simplex() {
 
     if(numVA > 0)
     {
-        //primeira fase
+        printf("Iniciando primeira fase do simplex\n");
+        primeiraFase();
+        imprimeTablau();
+        analisaPrimeiraFase();
     }
-    else{
-        printf("Iniciando segunda fase do simplex\n");
-        segundaFase();
-    }
+
+    printf("Iniciando segunda fase do simplex\n");
+    segundaFase();
 
     //imprime ultimo tablau
     printf("Tablau final\n");
     imprimeTablau();
+}
+
+void Simplex::somaLinhas(int linha1, int linha2){
+
+    for(int i = 0; i < colunas; i++)
+        tabela[linha1][i] += tabela[linha2][i];
+}
+
+void Simplex::ajustaColunaArtificial(){
+
+    int col = numVN + numVF + 1;
+
+    for(int i = col; i < colunas; i++) {
+       for(int j = z + 1; j < linhas; j++){
+           if(tabela[j][i] == 1) {
+               somaLinhas(za, j);
+               imprimeTablau();
+               break;
+           }
+       }
+    }
+}
+
+void Simplex::primeiraFase(){
+
+    int indEntra;
+    int indSai;
+
+    imprimeTablau();
+
+    ajustaColunaArtificial();
+
+    indEntra = entraBase(za); //Obtem nova variavel que entra na base
+
+    while(indEntra != -1) { //Checa se existe um índice que pode entrar na base
+
+        indSai = saiBase(indEntra); //obtem variavel que sai da base
+
+        imprimeTablau(); //imprime tablau
+
+        //Se o pivo for diferente de 1 ajusta a linha
+        if (tabela[indSai][indEntra] != 1.0) {
+            ajustaLinhaPivo(indSai, indEntra);
+        }
+
+        //Atualiza o tablau com a nova variavel basica
+        atualizaTablau(indSai, indEntra);
+
+        //Obtem nova variavel que entra na base
+        indEntra = entraBase(za);
+    }
 }
 
 void Simplex::segundaFase() {
@@ -212,7 +283,7 @@ int Simplex::saiBase(int coluna) {
     int indiceMinimo = 0;
     double min = 1000000000;
 
-    for(int i = 1; i < linhas; i++) {
+    for(int i = z + 1; i < linhas; i++) {
         if (tabela[i][coluna] > 0) {
             if (tabela[i][b] / tabela[i][coluna] < min) {
                 min = tabela[i][b] / tabela[i][coluna];
@@ -222,9 +293,9 @@ int Simplex::saiBase(int coluna) {
     }
 
     if(indiceMinimo > 0) //Se for um indice valido
-        printf("X%d sai da base\n ", bases[indiceMinimo-1]);
+        printf("X%d sai da base\n ", bases[indiceMinimo-z-1]);
 
-    return  indiceMinimo;
+    return indiceMinimo;
 }
 
 void Simplex::ajustaLinhaPivo(int l, int c){
@@ -258,14 +329,14 @@ void Simplex::atualizaTablau(int l, int c) {
     }
 
     //atualiza a variavel na base
-    bases[l-1] = c;
+    bases[l-z-1] = c;
 }
 
 bool Simplex::checaColuna(int c){
 
     //checa se a coluna da variavel candidata e toda negativa
 
-    for(int i = 1; i < linhas; i++)
+    for(int i = z + 1; i < linhas; i++)
         if(tabela[i][c] > 0)
             return true;
 
@@ -294,7 +365,7 @@ void Simplex::imprimeResultado() {
         printf("%.3lf\n", -tabela[z][b]);
     else
         printf("%.3lf\n", tabela[z][b]);
-    
+
     printf("x* = ( ");
 
     //
@@ -302,7 +373,7 @@ void Simplex::imprimeResultado() {
 
         if(naBase(i)){ //se a variavel esta na base
             int j = getIndBase(i);
-            printf("%.3lf ", tabela[j+1][b]); //imprime o valor da variavel
+            printf("%.3lf ", tabela[j+1+z][b]); //imprime o valor da variavel
         }
         else {
             if(tabela[z][i] == 0) //checa se uma variavel nao basica e zero na linha do z

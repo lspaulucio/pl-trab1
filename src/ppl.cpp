@@ -56,6 +56,7 @@ void PPL::readPPL(FILE* file){
 
         fscanf(file, "%s %lf", sinal, &matrizPPL[i][0]);
         restricoes[i] = checaSinal(sinal);
+        //criar funcao para caso o b seja negativo inverter o sinal da linha
     }
 }
 
@@ -138,7 +139,7 @@ int PPL::getNumVA(){
     int num = 0;
 
     for(int i = 1; i < numLinhas; i++){
-        if(getRestricao(i) != POS_SA) {
+        if(getRestricao(i) == SO_CA || getRestricao(i) == NEG_CA) {
             num++;
         }
     }
@@ -149,7 +150,7 @@ int PPL::getNumVF(){
     int num = 0;
 
     for(int i = 1; i < numLinhas; i++){
-        if(getRestricao(i) != SO_CA) {
+        if(getRestricao(i) == NEG_CA || getRestricao(i) == POS_SA) {
             num++;
         }
     }

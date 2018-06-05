@@ -41,6 +41,11 @@ class Simplex {
     void ajustaLinhaPivo(int, int);
     bool checaColuna(int);
     void imprimeResultado();
+    void somaLinhas(int, int);
+    void ajustaColunaArtificial();
+    void primeiraFase();
+    void analisaPrimeiraFase();
+    void verificaBase();
     void segundaFase();
     int getIndBase(int);
     bool naBase(int);
