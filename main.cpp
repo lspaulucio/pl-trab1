@@ -19,6 +19,7 @@ int main() {
 
     Simplex t;
     t.criaTablau(problema);
+    printf("Tablau inicial do PPL\n");
     t.imprimeTablau();
     t.simplex();
     t.imprimeResultado();

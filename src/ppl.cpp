@@ -7,7 +7,6 @@
 PPL::PPL(){
     matrizPPL = NULL;
     restricoes = NULL;
-
     n = 0;
     m = 0;
     tipoFuncao = 0;

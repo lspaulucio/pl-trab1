@@ -12,7 +12,7 @@ class Simplex {
 
     int funcao; //tipo da funcao MAX ou MIN
 
-    double **tabela; //tablau
+    double **tablau; //tablau
     int linhas; //numero de linhas do tablau
     int colunas; //numero de colunas do tablau
 
@@ -45,10 +45,12 @@ class Simplex {
     void ajustaColunaArtificial();
     void primeiraFase();
     void analisaPrimeiraFase();
+    void eliminaLinha(int);
     void verificaBase();
+    int linhaArtificialBase();
     void segundaFase();
     int getIndBase(int);
-    bool naBase(int);
+    bool taNaBase(int);
 
 };
 
