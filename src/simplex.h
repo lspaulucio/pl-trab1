@@ -20,7 +20,6 @@ class Simplex {
 
     int za; //indice da linha de za
     int z; //indice da linha de z
-
     int b; //indice da coluna de b
 
     int numVN; //numero de variaveis naturais

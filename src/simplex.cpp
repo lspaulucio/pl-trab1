@@ -1,6 +1,8 @@
 #include "simplex.h"
 #include "ppl.h"
 
+
+//Construtor
 Simplex::Simplex() {
     tablau = NULL;
     bases = NULL;
@@ -16,6 +18,7 @@ Simplex::Simplex() {
     numVB = 0;
 }
 
+//Funcao que cria o tableau a partir do PPL
 void Simplex::criaTablau(PPL p){
 
     numVN = p.getNumVN(); //numero de variaveis naturais
@@ -104,6 +107,7 @@ void Simplex::criaTablau(PPL p){
         }
 }
 
+//Funcao que imprime o tablau
 void Simplex::imprimeTablau() {
     int i, j, k = 1;
 
@@ -133,9 +137,6 @@ void Simplex::imprimeTablau() {
         else
             printf("X%d\t", bases[k++]); //printa as variaveis basicas
 
-
-//                printf("x1\t");
-
         for (j = 0; j < colunas; j++)
             printf("%.3lf\t", tablau[i][j]);
 
@@ -144,6 +145,7 @@ void Simplex::imprimeTablau() {
     printf("\n");
 }
 
+//Funcao que realiza o algoritmo do simplex
 void Simplex::simplex() {
 
     if(numVA > 0)
@@ -165,6 +167,7 @@ void Simplex::simplex() {
     imprimeTablau();
 }
 
+//Primeira fase do algoritmo simplex
 void Simplex::primeiraFase(){
 
     int indEntra;
@@ -193,6 +196,7 @@ void Simplex::primeiraFase(){
     }
 }
 
+//Segunda fase do algoritmo simplex
 void Simplex::segundaFase() {
 
     int indEntra = entraBase(z); //Obtem nova variavel que entra na base
@@ -218,6 +222,7 @@ void Simplex::segundaFase() {
 
 }
 
+//Realiza a analise ao fim da primeira fase
 void Simplex::analisaPrimeiraFase() {
 
     if(tablau[za][b] != 0) {
@@ -241,6 +246,7 @@ void Simplex::analisaPrimeiraFase() {
 
 }
 
+//Elimina linha do tableau
 void Simplex::eliminaLinha(int l){
 
     if(l == linhas - 1){
@@ -257,6 +263,7 @@ void Simplex::eliminaLinha(int l){
     linhas--;
 }
 
+//Ajusta a base ao final da primeira fase se existirem artificias nela
 void Simplex::verificaBase(){
 
     imprimeTablau();
@@ -307,6 +314,7 @@ void Simplex::verificaBase(){
     }
 }
 
+//Retorna a linha da artificial na base
 int Simplex::linhaArtificialBase(){
 
     int indArt = numVN + numVF;
@@ -320,13 +328,14 @@ int Simplex::linhaArtificialBase(){
 }
 
 
-
+//Soma linhas do Tableau
 void Simplex::somaLinhas(int linha1, int linha2){
 
     for(int i = 0; i < colunas; i++)
         tablau[linha1][i] += tablau[linha2][i];
 }
 
+//Realiza o ajuste inicial da primeira fase do simplex
 void Simplex::ajustaColunaArtificial(){
 
     printf("Ajustando colunas das variaveis basicas artificiais.\n");
@@ -344,8 +353,7 @@ void Simplex::ajustaColunaArtificial(){
     }
 }
 
-
-
+//Encontra a variavel que entrara na base
 int Simplex::entraBase(int linha){
 
     int indiceMaximo = -1;
@@ -366,6 +374,7 @@ int Simplex::entraBase(int linha){
     return indiceMaximo;
 }
 
+//Encontra a variavel que saira da base
 int Simplex::saiBase(int coluna) {
 
     int indiceMinimo = 0;
@@ -386,6 +395,7 @@ int Simplex::saiBase(int coluna) {
     return indiceMinimo;
 }
 
+//Ajusta a linha do pivo se ele for diferente de 1
 void Simplex::ajustaLinhaPivo(int l, int c){
 
     double pivo = tablau[l][c];
@@ -398,6 +408,7 @@ void Simplex::ajustaLinhaPivo(int l, int c){
     }
 }
 
+//Realiza as operacoes sobre o tableau para que a coluna seja zero menos na variavel da base
 void Simplex::atualizaTablau(int l, int c) {
 
     double fator; //variavel que multiplica o pivo para tornar a coluna igual a 0
@@ -420,6 +431,7 @@ void Simplex::atualizaTablau(int l, int c) {
     bases[l-z-1] = c;
 }
 
+//Verifica se a coluna e negativa e a solucao tende a inf
 bool Simplex::checaColuna(int c){
 
     //checa se a coluna da variavel candidata e toda negativa
@@ -442,6 +454,7 @@ bool Simplex::checaColuna(int c){
     exit(EXIT_SUCCESS);
 }
 
+//Verifica resultado ao final da segunda fase e imprime o resultado
 void Simplex::imprimeResultado() {
 
     bool variasSolucoes = false;
@@ -486,6 +499,8 @@ void Simplex::imprimeResultado() {
         printf("Solucao degenerada\n");
 }
 
+
+//Verifica se a variavel b esta na base
 bool Simplex::taNaBase(int b)
 {
     //verifica se a variavel b esta na base
@@ -496,6 +511,7 @@ bool Simplex::taNaBase(int b)
     return false;
 }
 
+//Retorna o indice da variavel b que esta na base
 int Simplex::getIndBase(int b){
     // obtem o indice da variavel na base, para poder imprimir
     for(int i = 0; i < numVB ; i++){

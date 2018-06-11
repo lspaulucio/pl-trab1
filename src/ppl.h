@@ -12,11 +12,12 @@ class PPL {
 
 	private:
 
+    int tipoFuncao;
+
     int n, m;
     double **matrizPPL;
-    int *restricoes;
 
-    int tipoFuncao;
+    int *restricoes;
 
     int numLinhas;
     int numColunas;
